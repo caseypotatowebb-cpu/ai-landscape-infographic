@@ -4,18 +4,977 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The 2025 AI Landscape: A Visual Comparison</title>
-    <meta name="description" content="Interactive infographic visualizing AI model comparisons across speed, reliability, and multimodal capabilities for mid-2025">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Color Palette: Energetic & Playful -->
+    <!-- NEITHER Mermaid JS NOR SVG were used anywhere in this output. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #2F4858;
+            color: #F7F7F7;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 60vh;
+            width: 100%;
+            max-width: 900px;
+            max-height: 500px;
+        }
+        .radar-chart-container {
+            position: relative;
+            margin: auto;
+            height: 50vh;
+            width: 100%;
+            max-width: 450px;
+            max-height: 450px;
+        }
+        .stat-card h3 {
+            color: #F6AE2D;
+        }
+        .gemini-feature-card {
+            background-color: #33658A;
+            border: 1px solid #55DDE0;
+        }
+        .gemini-button {
+            background-color: #F6AE2D;
+            color: #2F4858;
+            transition: background-color 0.3s;
+        }
+        .gemini-button:hover {
+            background-color: #F26419;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #F6AE2D;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body>
-    <h1>2025 AI Landscape Infographic</h1>
-    <p>This page will contain an interactive infographic comparing AI models. Full HTML content to be added shortly.</p>
-    <p>Features will include:</p>
-    <ul>
-        <li>Speed vs. Reliability comparison charts</li>
-        <li>Detailed model comparison table</li>
-        <li>AI Model Matchmaker tool</li>
-        <li>AI Prompt Enhancer</li>
-        <li>Multimodal capabilities overview</li>
-    </ul>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center mb-12 md:mb-20">
+            <h1 class="text-4xl md:text-6xl font-black text-white mb-4">The AI Landscape</h1>
+            <p class="text-xl md:text-2xl font-light text-[#55DDE0]">A Visual Guide to the Models of Mid-2025</p>
+            <p class="max-w-3xl mx-auto mt-4 text-gray-300">
+                The world of artificial intelligence is evolving at a breakneck pace. This infographic provides a snapshot of the key players, comparing them across critical metrics like reasoning reliability, speed, and their capacity for understanding our world through different modalities.
+            </p>
+        </header>
+
+        <main class="space-y-16 md:space-y-24">
+            
+            <!-- Gemini Feature: AI Model Matchmaker -->
+            <section class="gemini-feature-card rounded-2xl p-6 md:p-8 shadow-2xl">
+                <h2 class="text-3xl font-bold text-center mb-2 text-white">✨ AI Model Matchmaker</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-6">
+                    Don't know which model to choose? Describe your task below, and let Gemini analyze it to recommend the perfect AI for the job, complete with a detailed explanation.
+                </p>
+                <div class="max-w-2xl mx-auto">
+                    <textarea id="taskInput" class="w-full h-24 p-3 rounded-lg bg-[#2F4858] border border-gray-600 focus:ring-2 focus:ring-[#F6AE2D] focus:outline-none text-white" placeholder="e.g., 'I need to analyze a 500-page PDF report and create a summary presentation.' or 'Help me write a Python script for web scraping.'"></textarea>
+                    <button id="getRecommendationBtn" class="gemini-button w-full mt-4 py-3 rounded-lg font-bold text-lg flex items-center justify-center">
+                        <span id="recBtnText">Get Recommendation</span>
+                        <div id="recLoader" class="loader hidden ml-3"></div>
+                    </button>
+                    <div id="recommendationOutput" class="mt-6 p-4 bg-[#2F4858] rounded-lg min-h-[100px] text-gray-300"></div>
+                </div>
+            </section>
+
+            <!-- New Gemini Feature: AI Prompt Enhancer -->
+            <section class="gemini-feature-card rounded-2xl p-6 md:p-8 shadow-2xl">
+                <h2 class="text-3xl font-bold text-center mb-2 text-white">✨ AI Prompt Enhancer</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-6">
+                    Get better results from your chosen AI. Select a model, write a basic prompt, and Gemini will rewrite it to be more detailed and effective.
+                </p>
+                <div class="max-w-2xl mx-auto">
+                    <select id="modelSelect" class="w-full p-3 rounded-lg bg-[#2F4858] border border-gray-600 focus:ring-2 focus:ring-[#F6AE2D] focus:outline-none text-white mb-4">
+                        <option value="">-- Select a Model to Target --</option>
+                    </select>
+                    <textarea id="promptInput" class="w-full h-24 p-3 rounded-lg bg-[#2F4858] border border-gray-600 focus:ring-2 focus:ring-[#F6AE2D] focus:outline-none text-white" placeholder="e.g., 'write a poem about space' or 'explain black holes'"></textarea>
+                    <button id="enhancePromptBtn" class="gemini-button w-full mt-4 py-3 rounded-lg font-bold text-lg flex items-center justify-center">
+                        <span id="enhanceBtnText">Enhance Prompt</span>
+                        <div id="enhanceLoader" class="loader hidden ml-3"></div>
+                    </button>
+                    <div class="mt-6">
+                        <h3 class="font-bold text-lg text-[#55DDE0] mb-2">Enhanced Prompt:</h3>
+                        <div id="enhancedPromptOutput" class="p-4 bg-[#2F4858] rounded-lg min-h-[100px] text-gray-300 whitespace-pre-wrap"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 1: Speed vs. Reliability -->
+            <section class="bg-[#33658A]/50 rounded-2xl p-6 md:p-8 shadow-2xl">
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#55DDE0]">The Core Trade-Off: Speed vs. Reliability</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-8">
+                    How fast a model responds versus how often it gets complex tasks right is a fundamental dynamic. This scatter plot maps the leading models across these two axes, revealing distinct clusters of performance. The most desirable quadrant is the top-left: high reliability with high speed.
+                </p>
+                <div class="chart-container">
+                    <canvas id="speedVsReliabilityChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Section 2: Detailed Model Comparison -->
+            <section>
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#55DDE0]">Detailed Model Comparison</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-8">
+                    Here is a comprehensive breakdown of each model's capabilities, quirks, and ideal use cases. This table provides the granular data used to generate the charts throughout this infographic. On smaller screens, you can scroll the table horizontally.
+                </p>
+                <div id="reliabilityContainer" class="bg-[#33658A]/50 rounded-2xl shadow-2xl overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-300">
+                        <thead class="text-xs text-white uppercase bg-[#2F4858]">
+                            <tr>
+                                <th scope="col" class="px-4 py-3">Model</th>
+                                <th scope="col" class="px-4 py-3">Archetype</th>
+                                <th scope="col" class="px-4 py-3">Reasoning</th>
+                                <th scope="col" class="px-4 py-3">Speed</th>
+                                <th scope="col" class="px-4 py-3">Reliability %</th>
+                                <th scope="col" class="px-4 py-3">Max Context</th>
+                                <th scope="col" class="px-4 py-3">Ideal Tasks</th>
+                                <th scope="col" class="px-4 py-3">Avoid For</th>
+                                <th scope="col" class="px-4 py-3">Quirks & Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-700">
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">GPT‑3o</td>
+                                <td class="px-4 py-2">The Classic Workhorse</td>
+                                <td class="px-4 py-2">Follows simple, direct instructions with practical logic.</td>
+                                <td class="px-4 py-2">🐢 Deliberate (5/6)</td>
+                                <td class="px-4 py-2">55%</td>
+                                <td class="px-4 py-2">~4K</td>
+                                <td class="px-4 py-2">Quick chat, short edits, utility scripts</td>
+                                <td class="px-4 py-2">Complex reasoning; images/audio/video</td>
+                                <td class="px-4 py-2">💸 Cheap, can hallucinate; keep prompts tight</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">GPT‑4.1 Nano</td>
+                                <td class="px-4 py-2">The Scalable Specialist</td>
+                                <td class="px-4 py-2">Efficient, generalist logic optimized for high-volume operations.</td>
+                                <td class="px-4 py-2">🏎️ Very Fast (2/6)</td>
+                                <td class="px-4 py-2">75%</td>
+                                <td class="px-4 py-2">Up to ~1M</td>
+                                <td class="px-4 py-2">Summaries, light coding, batch ops</td>
+                                <td class="px-4 py-2">Deep multi‑step proofs; media</td>
+                                <td class="px-4 py-2">💰 Budget API; great for scale</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">GPT‑4.1 Mini</td>
+                                <td class="px-4 py-2">The Balanced Producer</td>
+                                <td class="px-4 py-2">Builds strong, tidy logical chains for consistent output.</td>
+                                <td class="px-4 py-2">🚗 Fast (3/6)</td>
+                                <td class="px-4 py-2">85%</td>
+                                <td class="px-4 py-2">Up to ~1M</td>
+                                <td class="px-4 py-2">Balanced dev/writing; long docs via API</td>
+                                <td class="px-4 py-2">Heavy multimodal; ultra‑nuanced logic</td>
+                                <td class="px-4 py-2">📈 Value workhorse; predictable</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">GPT‑4o</td>
+                                <td class="px-4 py-2">The Well-Rounded Flagship</td>
+                                <td class="px-4 py-2">Structures deep, conversational logic for seamless interaction.</td>
+                                <td class="px-4 py-2">🚀 Fastest (1/6)</td>
+                                <td class="px-4 py-2">88%</td>
+                                <td class="px-4 py-2">128K</td>
+                                <td class="px-4 py-2">Daily multimodal, screenshots/diagrams, fast drafts</td>
+                                <td class="px-4 py-2">Million‑token analysis; very long chains</td>
+                                <td class="px-4 py-2">⚡ Snappy; great image Q&A; UI‑native</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">GPT‑4.5</td>
+                                <td class="px-4 py-2">The Creative Wordsmith</td>
+                                <td class="px-4 py-2">Polished, creative analysis with a refined, artistic flair.</td>
+                                <td class="px-4 py-2">🚗 Fast (3/6)</td>
+                                <td class="px-4 py-2">86%</td>
+                                <td class="px-4 py-2">~128K</td>
+                                <td class="px-4 py-2">Premium writing, precise edits, tough Q&A</td>
+                                <td class="px-4 py-2">Ultra‑long inputs; API deprecations</td>
+                                <td class="px-4 py-2">🎭 Refined tone; some report reasoning trade-offs</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Gemini 2.5 Flash</td>
+                                <td class="px-4 py-2">The Agile Prototyper</td>
+                                <td class="px-4 py-2">Agile, practical reasoning for fast-paced, grounded answers.</td>
+                                <td class="px-4 py-2">🏎️ Very Fast (2/6)</td>
+                                <td class="px-4 py-2">82%</td>
+                                <td class="px-4 py-2">~1M</td>
+                                <td class="px-4 py-2">Speedy research, media Q&A, prototyping</td>
+                                <td class="px-4 py-2">Very long multi‑doc logic</td>
+                                <td class="px-4 py-2">🧩 Fastest Gemini; great for mixed input</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Gemini 2.5 Pro</td>
+                                <td class="px-4 py-2">The Intelligence Inquisitor</td>
+                                <td class="px-4 py-2">Synthesizes expert logic from multiple signals and modalities.</td>
+                                <td class="px-4 py-2">🚙 Moderate (4/6)</td>
+                                <td class="px-4 py-2">95%</td>
+                                <td class="px-4 py-2">1M (2M coming)</td>
+                                <td class="px-4 py-2">Complex projects, video scene search, multimodal briefs</td>
+                                <td class="px-4 py-2">Tiny chores; ultra‑casual chat</td>
+                                <td class="px-4 py-2">🛠️ Ultimate multimodal analyst</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Venice Small</td>
+                                <td class="px-4 py-2">The Pocket Assistant</td>
+                                <td class="px-4 py-2">Follows basic instructions for lightweight, local tasks.</td>
+                                <td class="px-4 py-2">🐢 Deliberate (5/6)</td>
+                                <td class="px-4 py-2">68%</td>
+                                <td class="px-4 py-2">~41K</td>
+                                <td class="px-4 py-2">Local/lightweight helpers, simple image questions</td>
+                                <td class="px-4 py-2">Heavy reasoning; long memory</td>
+                                <td class="px-4 py-2">📦 Small, easy to host; economical</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Venice Medium</td>
+                                <td class="px-4 py-2">Seeing & Speaking</td>
+                                <td class="px-4 py-2">Chains together visual understanding with balanced text reasoning.</td>
+                                <td class="px-4 py-2">🚙 Moderate (4/6)</td>
+                                <td class="px-4 py-2">78%</td>
+                                <td class="px-4 py-2">~131K</td>
+                                <td class="px-4 py-2">Visual + text tasks, moderate reasoning, app scaffolds</td>
+                                <td class="px-4 py-2">Very deep math proofs; massive corpora</td>
+                                <td class="px-4 py-2">🌐 Venice’s in‑house visual model</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Venice Large</td>
+                                <td class="px-4 py-2">The Secret Supersoldier</td>
+                                <td class="px-4 py-2">Conducts large-scale synthesis like a powerful, open-source expert.</td>
+                                <td class="px-4 py-2">🐢 Deliberate (5/6)</td>
+                                <td class="px-4 py-2">79%</td>
+                                <td class="px-4 py-2">~131K</td>
+                                <td class="px-4 py-2">Heavy open‑source inference, complex synthesis</td>
+                                <td class="px-4 py-2">Lightweight/on‑device use</td>
+                                <td class="px-4 py-2">🔓 Open powerhouse; MoE; great for big jobs</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Venice Uncensored</td>
+                                <td class="px-4 py-2">Freedom and Flavor</td>
+                                <td class="px-4 py-2">Applies free-form, creative reasoning with minimal guardrails.</td>
+                                <td class="px-4 py-2">🏎️ Very Fast (2/6)</td>
+                                <td class="px-4 py-2">65%</td>
+                                <td class="px-4 py-2">~33K</td>
+                                <td class="px-4 py-2">Unrestricted creativity, stylized writing, edgy tasks</td>
+                                <td class="px-4 py-2">Compliance‑sensitive, formal reports</td>
+                                <td class="px-4 py-2">🎨 Fewer guardrails; needs your steering</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Venice Reasoning</td>
+                                <td class="px-4 py-2">The Puzzle Master</td>
+                                <td class="px-4 py-2">Deploys explicit, transparent, step-by-step logic for proofs.</td>
+                                <td class="px-4 py-2">🐢 Deliberate (5/6)</td>
+                                <td class="px-4 py-2">89%</td>
+                                <td class="px-4 py-2">~33K</td>
+                                <td class="px-4 py-2">Logic puzzles, proofs, planning trees</td>
+                                <td class="px-4 py-2">Image/video/audio analysis</td>
+                                <td class="px-4 py-2">🧮 RL‑boosted reasoning specialist</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Llama‑3.1‑405B</td>
+                                <td class="px-4 py-2">The Sovereign Enterprise</td>
+                                <td class="px-4 py-2">Provides deep, research-grade analysis for controlled deployments.</td>
+                                <td class="px-4 py-2">🐘 Slowest (6/6)</td>
+                                <td class="px-4 py-2">90%</td>
+                                <td class="px-4 py-2">~128K</td>
+                                <td class="px-4 py-2">Private deployments, compliance, controlled pipelines</td>
+                                <td class="px-4 py-2">Fast, casual multimodal</td>
+                                <td class="px-4 py-2">🏛️ On‑prem favorite; context varies</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Copilot</td>
+                                <td class="px-4 py-2">The Empathetic Chaplin</td>
+                                <td class="px-4 py-2">Applies structured, business-grade logic with a helpful tone.</td>
+                                <td class="px-4 py-2">🚀 Fastest (1/6)</td>
+                                <td class="px-4 py-2">85%</td>
+                                <td class="px-4 py-2">~128K</td>
+                                <td class="px-4 py-2">Office docs, code in IDEs, meetings</td>
+                                <td class="px-4 py-2">Free‑form creative art; raw APIs</td>
+                                <td class="px-4 py-2">🖥️ Smart routing; deep Office/IDE integration</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Perplexity — Best</td>
+                                <td class="px-4 py-2">The Cited Researcher</td>
+                                <td class="px-4 py-2">Synthesizes answers meticulously, backing claims with sources.</td>
+                                <td class="px-4 py-2">🚙 Moderate (4/6)</td>
+                                <td class="px-4 py-2">96%</td>
+                                <td class="px-4 py-2">Live</td>
+                                <td class="px-4 py-2">Rapid research with citations; compare sources</td>
+                                <td class="px-4 py-2">Offline work; heavy code gen</td>
+                                <td class="px-4 py-2">🔎 Routes among providers; concise by default</td>
+                            </tr>
+                             <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Perplexity — Sonar</td>
+                                <td class="px-4 py-2">The Engaging Encyclopedia</td>
+                                <td class="px-4 py-2">Delivers crisp, speed-first summaries of web-grounded facts.</td>
+                                <td class="px-4 py-2">🚀 Fastest (1/6)</td>
+                                <td class="px-4 py-2">84%</td>
+                                <td class="px-4 py-2">Live</td>
+                                <td class="px-4 py-2">Quick lookups, news, definitions, fast briefs</td>
+                                <td class="px-4 py-2">Deep multi‑step reasoning; long creative</td>
+                                <td class="px-4 py-2">⚡ Minimal preamble; short answers by design</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Claude 4.0 Sonnet</td>
+                                <td class="px-4 py-2">The Constitutional Poet</td>
+                                <td class="px-4 py-2">Weaves careful, coherent, and thoughtful long-form prose.</td>
+                                <td class="px-4 py-2">🚙 Moderate (4/6)</td>
+                                <td class="px-4 py-2">97%</td>
+                                <td class="px-4 py-2">~200K</td>
+                                <td class="px-4 py-2">Thoughtful writing, safety‑sensitive docs, editing</td>
+                                <td class="px-4 py-2">Heavy code execution; image generation</td>
+                                <td class="px-4 py-2">🤝 Polite, low‑hallucination style</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Claude 4.0 Sonnet Thinking</td>
+                                <td class="px-4 py-2">The Deliberate Strategist</td>
+                                <td class="px-4 py-2">Constructs deliberate, structured steps for complex planning.</td>
+                                <td class="px-4 py-2">🐢 Deliberate (5/6)</td>
+                                <td class="px-4 py-2">98%</td>
+                                <td class="px-4 py-2">~200K</td>
+                                <td class="px-4 py-2">Complex planning, proofs, deliberate reviews</td>
+                                <td class="px-4 py-2">Rapid chat; playful ideation</td>
+                                <td class="px-4 py-2">🧩 “Thinking” trades speed for rigor</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">Grok 4</td>
+                                <td class="px-4 py-2">The Biased, Blunt Brute</td>
+                                <td class="px-4 py-2">Uses bold, direct, and less-filtered logic for punchy answers.</td>
+                                <td class="px-4 py-2">🚗 Fast (3/6)</td>
+                                <td class="px-4 py-2">70%</td>
+                                <td class="px-4 py-2">~256K</td>
+                                <td class="px-4 py-2">Current events, X‑ecosystem queries, punchy briefs</td>
+                                <td class="px-4 py-2">Compliance‑sensitive, formal reports</td>
+                                <td class="px-4 py-2">😏 Edgier tone; fewer safety rails</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">o3</td>
+                                <td class="px-4 py-2">The Reasoning Engineer</td>
+                                <td class="px-4 py-2">Applies specialized, structured logic for technical domains.</td>
+                                <td class="px-4 py-2">🚙 Moderate (4/6)</td>
+                                <td class="px-4 py-2">91%</td>
+                                <td class="px-4 py-2">~128K</td>
+                                <td class="px-4 py-2">Complex coding, STEM problems, math proofs</td>
+                                <td class="px-4 py-2">Creative writing, general chat</td>
+                                <td class="px-4 py-2">🔬 A reasoning specialist, not a generalist</td>
+                            </tr>
+                            <tr class="hover:bg-[#33658A]">
+                                <td class="px-4 py-2 font-semibold">GPT‑5</td>
+                                <td class="px-4 py-2">The Emotionally Lobotomized Superintelligence</td>
+                                <td class="px-4 py-2">Deploys state-of-the-art logic with creative, polished output.</td>
+                                <td class="px-4 py-2">🚗 Fast (3/6)</td>
+                                <td class="px-4 py-2">96%</td>
+                                <td class="px-4 py-2">~128K</td>
+                                <td class="px-4 py-2">High‑level reasoning; premium writing; image Q&A</td>
+                                <td class="px-4 py-2">Million‑token doc crunching</td>
+                                <td class="px-4 py-2">🧪 New; features/UI may shift</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Section 3: The Multimodal Revolution -->
+            <section>
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#55DDE0]">The Multimodal Revolution</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-8">
+                    The ability to understand more than just text is no longer a novelty; it's a core feature of flagship models. From analyzing images and documents to processing real-time audio and video, these models are becoming true "omni" assistants.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="stat-card bg-[#33658A]/50 rounded-2xl p-6 shadow-2xl text-center">
+                        <h3 class="text-2xl font-bold mb-2">Gemini 2.5 Pro</h3>
+                        <p class="text-6xl mb-2">🎬</p>
+                        <p class="text-gray-300">The ultimate analyst, processing text, images, audio, and full video clips for deep, temporal queries.</p>
+                    </div>
+                    <div class="stat-card bg-[#33658A]/50 rounded-2xl p-6 shadow-2xl text-center">
+                        <h3 class="text-2xl font-bold mb-2">GPT-4o</h3>
+                        <p class="text-6xl mb-2">🗣️</p>
+                        <p class="text-gray-300">A seamless conversationalist, natively integrating text, image, and real-time voice input.</p>
+                    </div>
+                    <div class="stat-card bg-[#33658A]/50 rounded-2xl p-6 shadow-2xl text-center">
+                        <h3 class="text-2xl font-bold mb-2">Venice Medium</h3>
+                        <p class="text-6xl mb-2">👁️</p>
+                        <p class="text-gray-300">A visually-aware specialist, chaining image understanding with strong text-based reasoning.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 4: The Specialists -->
+            <section>
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#55DDE0]">Meet the Specialists</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-8">
+                    Beyond the general-purpose flagships, a diverse ecosystem of specialized models has emerged. Each is fine-tuned for a specific purpose, from pure, uncensored creativity to rigorous, step-by-step logical proofs.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div class="bg-[#33658A]/50 rounded-2xl p-6 md:p-8 shadow-2xl">
+                        <h3 class="text-2xl font-bold text-center mb-4 text-white">Venice Uncensored</h3>
+                        <div class="radar-chart-container">
+                            <canvas id="veniceUncensoredChart"></canvas>
+                        </div>
+                        <p class="text-center mt-4 text-gray-300">Archetype: <span class="font-semibold text-[#F26419]">Freedom and Flavor</span>. This model prioritizes creative freedom and speed over guardrails and context, making it a powerful tool for edgy, stylized writing.</p>
+                    </div>
+                    <div class="bg-[#33658A]/50 rounded-2xl p-6 md:p-8 shadow-2xl">
+                        <h3 class="text-2xl font-bold text-center mb-4 text-white">Venice Reasoning</h3>
+                        <div class="radar-chart-container">
+                            <canvas id="veniceReasoningChart"></canvas>
+                        </div>
+                        <p class="text-center mt-4 text-gray-300">Archetype: <span class="font-semibold text-[#F26419]">The Puzzle Master</span>. Built for one thing: explicit, transparent logic. It trades speed for deep, step-by-step analysis, excelling at proofs and puzzles.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section 5: The Context Window Chasm -->
+            <section>
+                <h2 class="text-3xl font-bold text-center mb-2 text-[#55DDE0]">The Context Window Chasm</h2>
+                <p class="text-center text-gray-300 max-w-4xl mx-auto mb-8">
+                    A model's "context window" is its short-term memory—the amount of information it can hold at once. In 2025, the gap between standard and long-context models is vast, enabling entirely new use cases like analyzing entire codebases or novels in a single prompt.
+                </p>
+                <div class="bg-[#33658A]/50 rounded-2xl p-6 md:p-8 shadow-2xl">
+                    <div class="chart-container h-[70vh] max-h-[600px]">
+                        <canvas id="contextWindowChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="text-center mt-16 md:mt-24 pt-8 border-t border-gray-700">
+            <p class="text-gray-400">Infographic generated based on the "Model Comparison Reference (Mid‑2025, Definitive Edition)".</p>
+            <p class="text-xs text-gray-500 mt-2">Data visualizations created with Chart.js and Tailwind CSS. Interactive features powered by the Gemini API.</p>
+        </footer>
+    </div>
+
+    <script>
+        const data = [
+            { model: 'GPT‑3o', archetype: 'The Classic Workhorse', reasoning: 'Follows simple, direct instructions with practical logic.', speed: 5, reliability: 55, context: 4000 },
+            { model: 'GPT‑4.1 Nano', archetype: 'The Scalable Specialist', reasoning: 'Efficient, generalist logic optimized for high-volume operations.', speed: 2, reliability: 75, context: 1000000 },
+            { model: 'GPT‑4.1 Mini', archetype: 'The Balanced Producer', reasoning: 'Builds strong, tidy logical chains for consistent output.', speed: 3, reliability: 85, context: 1000000 },
+            { model: 'GPT‑4o', archetype: 'The Well-Rounded Flagship', reasoning: 'Structures deep, conversational logic for seamless interaction.', speed: 1, reliability: 88, context: 128000 },
+            { model: 'GPT‑4.5', archetype: 'The Creative Wordsmith', reasoning: 'Polished, creative analysis with a refined, artistic flair.', speed: 3, reliability: 86, context: 128000 },
+            { model: 'Gemini 2.5 Flash', archetype: 'The Agile Prototyper', reasoning: 'Agile, practical reasoning for fast-paced, grounded answers.', speed: 2, reliability: 82, context: 1000000 },
+            { model: 'Gemini 2.5 Pro', archetype: 'The Intelligence Inquisitor', reasoning: 'Synthesizes expert logic from multiple signals and modalities.', speed: 4, reliability: 95, context: 1000000 },
+            { model: 'Venice Small', archetype: 'The Pocket Assistant', reasoning: 'Follows basic instructions for lightweight, local tasks.', speed: 5, reliability: 68, context: 41000 },
+            { model: 'Venice Medium', archetype: 'Seeing & Speaking', reasoning: 'Chains together visual understanding with balanced text reasoning.', speed: 4, reliability: 78, context: 131000 },
+            { model: 'Venice Large', archetype: 'The Secret Supersoldier', reasoning: 'Conducts large-scale synthesis like a powerful, open-source expert.', speed: 5, reliability: 79, context: 131000 },
+            { model: 'Venice Uncensored', archetype: 'Freedom and Flavor', reasoning: 'Applies free-form, creative reasoning with minimal guardrails.', speed: 2, reliability: 65, context: 33000 },
+            { model: 'Venice Reasoning', archetype: 'The Puzzle Master', reasoning: 'Deploys explicit, transparent, step-by-step logic for proofs.', speed: 5, reliability: 89, context: 33000 },
+            { model: 'Llama‑3.1‑405B', archetype: 'The Sovereign Enterprise', reasoning: 'Provides deep, research-grade analysis for controlled deployments.', speed: 6, reliability: 90, context: 128000 },
+            { model: 'Copilot', archetype: 'The Empathetic Chaplin', reasoning: 'Applies structured, business-grade logic with a helpful tone.', speed: 1, reliability: 85, context: 128000 },
+            { model: 'Perplexity — Best', archetype: 'The Cited Researcher', reasoning: 'Synthesizes answers meticulously, backing claims with sources.', speed: 4, reliability: 96, context: 0 },
+            { model: 'Perplexity — Sonar', archetype: 'The Engaging Encyclopedia', reasoning: 'Delivers crisp, speed-first summaries of web-grounded facts.', speed: 1, reliability: 84, context: 0 },
+            { model: 'Claude 4.0 Sonnet', archetype: 'The Constitutional Poet', reasoning: 'Weaves careful, coherent, and thoughtful long-form prose.', speed: 4, reliability: 97, context: 200000 },
+            { model: 'Claude 4.0 Sonnet Thinking', archetype: 'The Deliberate Strategist', reasoning: 'Constructs deliberate, structured steps for complex planning.', speed: 5, reliability: 98, context: 200000 },
+            { model: 'Grok 4', archetype: 'The Biased, Blunt Brute', reasoning: 'Uses bold, direct, and less-filtered logic for punchy answers.', speed: 3, reliability: 70, context: 256000 },
+            { model: 'o3', archetype: 'The Reasoning Engineer', reasoning: 'Applies specialized, structured logic for technical domains.', speed: 4, reliability: 91, context: 128000 },
+            { model: 'GPT‑5', archetype: 'The Emotionally Lobotomized Superintelligence', reasoning: 'Deploys state-of-the-art logic with creative, polished output.', speed: 3, reliability: 96, context: 128000 },
+        ];
+
+        const colors = {
+            blue: '#55DDE0',
+            darkBlue: '#33658A',
+            darkestBlue: '#2F4858',
+            yellow: '#F6AE2D',
+            orange: '#F26419',
+            grey: '#999999'
+        };
+        
+        const tooltipPlugin = {
+            plugins: {
+                tooltip: {
+                    backgroundColor: 'rgba(47, 72, 88, 0.9)',
+                    titleColor: '#F6AE2D',
+                    bodyColor: '#F7F7F7',
+                    borderColor: '#55DDE0',
+                    borderWidth: 1,
+                    padding: 10,
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            }
+                            return label;
+                        },
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.raw && typeof context.raw === 'object' && context.raw !== null) {
+                                if (context.dataset.label === 'Reliability') {
+                                    label += `${context.raw.y}%`;
+                                } else if (context.dataset.label === 'Speed') {
+                                    label += `Tier ${context.raw.x}`;
+                                } else {
+                                    label += `(${context.raw.x}, ${context.raw.y}%)`;
+                                }
+                            } else {
+                                label += context.formattedValue;
+                            }
+                            return label;
+                        }
+                    }
+                },
+                legend: {
+                    labels: {
+                        color: '#F7F7F7'
+                    }
+                }
+            }
+        };
+        
+        function wrapLabel(str) {
+            const maxLength = 16;
+            if (str.length <= maxLength) return str;
+            
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            words.forEach(word => {
+                if ((currentLine + word).length > maxLength) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            });
+            lines.push(currentLine.trim());
+            return lines.filter(line => line.length > 0);
+        }
+
+        async function callGemini(prompt, button, loader, btnTextElement) {
+            button.disabled = true;
+            loader.classList.remove('hidden');
+            if (btnTextElement) btnTextElement.classList.add('hidden');
+
+            let retries = 3;
+            let delay = 1000;
+            let responseText = 'Sorry, something went wrong. Please try again.';
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    
+                    const payload = {
+                        contents: [{ role: "user", parts: [{ text: prompt }] }]
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    
+                    if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        responseText = result.candidates[0].content.parts[0].text;
+                        break; 
+                    } else {
+                         throw new Error('Invalid response structure from Gemini API');
+                    }
+                } catch (error) {
+                    console.error(`Attempt ${i + 1} failed:`, error);
+                    if (i < retries - 1) {
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    }
+                }
+            }
+            
+            button.disabled = false;
+            loader.classList.add('hidden');
+            if (btnTextElement) btnTextElement.classList.remove('hidden');
+            return responseText;
+        }
+
+        async function callGeminiWithJson(prompt, schema, button, loader, btnTextElement) {
+            button.disabled = true;
+            loader.classList.remove('hidden');
+            if (btnTextElement) btnTextElement.classList.add('hidden');
+
+            let retries = 3;
+            let delay = 1000;
+            let responseJson = null;
+
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const apiKey = "";
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+                    
+                    const payload = {
+                        contents: [{ parts: [{ text: prompt }] }],
+                        generationConfig: {
+                            responseMimeType: "application/json",
+                            responseSchema: schema,
+                        }
+                    };
+
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const result = await response.json();
+
+                    if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                        responseJson = JSON.parse(result.candidates[0].content.parts[0].text);
+                        break;
+                    } else {
+                        throw new Error('Invalid JSON response structure from Gemini API');
+                    }
+                } catch (error) {
+                    console.error(`Attempt ${i + 1} with JSON failed:`, error);
+                    if (i < retries - 1) {
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2;
+                    } else {
+                        responseJson = { error: "Could not get a valid recommendation. Please try again." };
+                    }
+                }
+            }
+
+            button.disabled = false;
+            loader.classList.add('hidden');
+            if (btnTextElement) btnTextElement.classList.remove('hidden');
+            return responseJson;
+        }
+
+
+        document.getElementById('getRecommendationBtn').addEventListener('click', async () => {
+            const taskInput = document.getElementById('taskInput').value;
+            const output = document.getElementById('recommendationOutput');
+            if (!taskInput.trim()) {
+                output.textContent = 'Please describe your task first.';
+                return;
+            }
+            output.innerHTML = '<div class="flex justify-center items-center"><div class="loader"></div><span class="ml-3">Finding the best match...</span></div>';
+
+            const modelList = data.map(d => `- ${d.model} (Archetype: ${d.archetype}): ${d.reasoning} Speed Tier ${d.speed}/6, Reliability ${d.reliability}%. Context: ${d.context} tokens.`).join('\n');
+            const prompt = `Based on the following list of AI models and their characteristics, which model would be the absolute best choice for this user's task? Also provide a good alternative and the trade-offs.
+
+User's Task: "${taskInput}"
+
+Model List:
+${modelList}
+
+Fill out the JSON object according to the schema. The justification and trade-offs should be detailed and helpful.`;
+            
+            const schema = {
+                type: "OBJECT",
+                properties: {
+                    "recommendedModel": { "type": "STRING", "description": "The name of the single best model for the task." },
+                    "justification": { "type": "STRING", "description": "A detailed explanation of why this model is the best choice." },
+                    "alternativeModel": { "type": "STRING", "description": "A good second-choice model, if applicable." },
+                    "tradeOffs": { "type": "STRING", "description": "Why someone might choose the alternative model over the primary recommendation (e.g., faster, cheaper, better for a specific nuance)." }
+                },
+                required: ["recommendedModel", "justification"]
+            };
+
+            const btn = document.getElementById('getRecommendationBtn');
+            const loader = document.getElementById('recLoader');
+            const btnText = document.getElementById('recBtnText');
+            
+            const result = await callGeminiWithJson(prompt, schema, btn, loader, btnText);
+
+            if (result && !result.error) {
+                let html = `<div class="space-y-4">`;
+                html += `<div class="p-4 rounded-lg bg-[#55DDE0]/10 border border-[#55DDE0]">
+                            <h3 class="font-bold text-lg text-[#55DDE0]">🏆 Primary Recommendation: ${result.recommendedModel}</h3>
+                            <p class="mt-2 text-gray-200">${result.justification}</p>
+                         </div>`;
+                if(result.alternativeModel && result.tradeOffs) {
+                    html += `<div class="p-4 rounded-lg bg-gray-500/10 border border-gray-500">
+                                <h3 class="font-bold text-lg text-gray-300">🥈 Alternative: ${result.alternativeModel}</h3>
+                                <p class="mt-2 text-gray-400"><span class="font-semibold">Trade-offs:</span> ${result.tradeOffs}</p>
+                             </div>`;
+                }
+                html += `</div>`;
+                output.innerHTML = html;
+            } else {
+                output.textContent = result.error || 'Failed to get a recommendation.';
+            }
+        });
+
+        document.getElementById('enhancePromptBtn').addEventListener('click', async () => {
+            const selectedModelName = document.getElementById('modelSelect').value;
+            const promptInput = document.getElementById('promptInput').value;
+            const output = document.getElementById('enhancedPromptOutput');
+
+            if (!selectedModelName) {
+                output.textContent = 'Please select a model to target first.';
+                return;
+            }
+            if (!promptInput.trim()) {
+                output.textContent = 'Please enter a basic prompt to enhance.';
+                return;
+            }
+
+            const model = data.find(d => d.model === selectedModelName);
+            const prompt = `Act as an expert prompt engineer. Your goal is to rewrite a user's simple prompt to be much more detailed and effective for a specific AI model.
+
+The target model is "${model.model}". It has these characteristics:
+- Archetype: "${model.archetype}"
+- Reasoning Style: "${model.reasoning}"
+
+The user's simple prompt is: "${promptInput}"
+
+Rewrite the user's prompt into an advanced prompt. The new prompt should be structured to get the best possible output by playing to the model's strengths. For example, if it's a creative model, encourage vivid descriptions. If it's a reasoning model, suggest it use step-by-step thinking. Return only the new, enhanced prompt.`;
+
+            const btn = document.getElementById('enhancePromptBtn');
+            const loader = document.getElementById('enhanceLoader');
+            const btnText = document.getElementById('enhanceBtnText');
+
+            output.textContent = 'Enhancing prompt...';
+            const enhancedPrompt = await callGemini(prompt, btn, loader, btnText);
+            output.textContent = enhancedPrompt;
+        });
+
+
+        // This function is no longer needed as the interactive archetype feature is replaced by the table.
+        /*
+        async function generateNewArchetype(modelName, button) {
+            const model = data.find(d => d.model === modelName);
+            if (!model) return;
+
+            const prompt = `An AI model named "${model.model}" has the following characteristics:
+-   Current Archetype: "${model.archetype}"
+-   Reasoning Style: "${model.reasoning}"
+-   Speed: Tier ${model.speed} out of 6 (where 1 is fastest)
+-   Reliability on Complex Tasks: ${model.reliability}%
+
+Based on these stats, generate a new, creative, and fitting one-to-three word "Archetype" for this model. Be imaginative. Just return the new archetype name itself, without any extra text or quotation marks.`;
+            
+            const originalText = button.innerHTML;
+            button.innerHTML = '<div class="loader mx-auto"></div>';
+            button.disabled = true;
+
+            const newArchetype = await callGemini(prompt, button, { classList: { remove: ()=>{}, add: ()=>{} } }, null);
+
+            if (newArchetype) {
+                const p = button.previousElementSibling;
+                p.innerHTML = `Original Archetype: ${model.archetype}<br>✨ New Gemini Archetype: <span class="font-bold text-[#F6AE2D]">${newArchetype.trim()}</span>`;
+            }
+            
+            button.innerHTML = originalText;
+            button.disabled = false;
+        }
+        */
+
+        function populateModelSelect() {
+            const select = document.getElementById('modelSelect');
+            data.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model.model;
+                option.textContent = model.model;
+                select.appendChild(option);
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            populateModelSelect();
+        });
+
+
+        // Chart 1: Speed vs Reliability
+        new Chart(document.getElementById('speedVsReliabilityChart'), {
+            type: 'scatter',
+            data: {
+                labels: data.map(d => wrapLabel(d.model)),
+                datasets: [{
+                    label: 'AI Models',
+                    data: data.map(d => ({ x: d.speed, y: d.reliability, label: d.model })),
+                    backgroundColor: colors.blue,
+                    borderColor: colors.yellow,
+                    pointRadius: 8,
+                    pointHoverRadius: 12,
+                }]
+            },
+            options: {
+                ...tooltipPlugin,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Speed (1=Fastest, 6=Slowest)', color: '#F7F7F7', font: { size: 14 } },
+                        reverse: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#F7F7F7' }
+                    },
+                    y: {
+                        title: { display: true, text: 'Reliability on Complex Tasks (%)', color: '#F7F7F7', font: { size: 14 } },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#F7F7F7' }
+                    }
+                }
+            }
+        });
+
+        // Chart 2: Reliability (This chart is now replaced by the static table)
+        /*
+        const reliableModels = data.filter(d => d.reliability >= 90).sort((a, b) => b.reliability - a.reliability);
+        const reliabilityContainer = document.getElementById('reliabilityContainer');
+        
+        const chartDiv = document.createElement('div');
+        chartDiv.className = 'chart-container h-[60vh] max-h-[500px] mb-6';
+        const canvas = document.createElement('canvas');
+        canvas.id = 'reliabilityChart';
+        chartDiv.appendChild(canvas);
+        reliabilityContainer.appendChild(chartDiv);
+
+        new Chart(canvas, {
+            type: 'bar',
+            data: {
+                labels: reliableModels.map(d => wrapLabel(d.model)),
+                datasets: [{
+                    label: 'Reliability %',
+                    data: reliableModels.map(d => d.reliability),
+                    backgroundColor: [colors.blue, colors.yellow, colors.orange, colors.darkBlue, '#4CAF50', '#8E44AD'],
+                    borderColor: '#2F4858',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...tooltipPlugin,
+                indexAxis: 'y',
+                maintainAspectRatio: false,
+                scales: {
+                    x: { beginAtZero: true, max: 100, grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#F7F7F7' } },
+                    y: { grid: { display: false }, ticks: { color: '#F7F7F7' } }
+                }
+            }
+        });
+
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4';
+        reliableModels.forEach(model => {
+            const modelDiv = document.createElement('div');
+            modelDiv.className = 'text-center p-3 bg-[#2F4858] rounded-lg';
+            const p = document.createElement('p');
+            p.className = 'text-sm text-gray-300 mb-2';
+            p.innerHTML = `Current Archetype: <span class="font-semibold">${model.archetype}</span>`;
+            modelDiv.appendChild(p);
+
+            const btn = document.createElement('button');
+            btn.className = 'gemini-button text-xs font-bold py-1 px-3 rounded-full w-48 h-8';
+            btn.innerHTML = `✨ Generate New Archetype for ${model.model}`;
+            btn.onclick = () => generateNewArchetype(model.model, btn);
+            modelDiv.appendChild(btn);
+            buttonContainer.appendChild(modelDiv);
+        });
+        reliabilityContainer.appendChild(buttonContainer);
+        */
+
+
+        // Chart 3 & 4: Radar Charts for Specialists
+        const radarOptions = {
+            ...tooltipPlugin,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    angleLines: { color: 'rgba(255, 255, 255, 0.2)' },
+                    grid: { color: 'rgba(255, 255, 255, 0.2)' },
+                    pointLabels: { color: '#F7F7F7', font: { size: 12 } },
+                    ticks: { color: '#2F4858', backdropColor: 'rgba(246, 174, 45, 0.7)', stepSize: 25 },
+                    min: 0,
+                    max: 100
+                }
+            }
+        };
+
+        const uncensoredData = data.find(d => d.model === 'Venice Uncensored');
+        new Chart(document.getElementById('veniceUncensoredChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Reliability', 'Speed (Inv)', 'Context Size', 'Freedom/Creativity'],
+                datasets: [{
+                    label: 'Venice Uncensored',
+                    data: [uncensoredData.reliability, (7 - uncensoredData.speed) * 100 / 6, (uncensoredData.context / 200000) * 100, 95],
+                    backgroundColor: 'rgba(242, 100, 25, 0.4)',
+                    borderColor: colors.orange,
+                    pointBackgroundColor: colors.orange,
+                    pointBorderColor: '#fff',
+                }]
+            },
+            options: radarOptions
+        });
+        
+        const reasoningData = data.find(d => d.model === 'Venice Reasoning');
+        new Chart(document.getElementById('veniceReasoningChart'), {
+            type: 'radar',
+            data: {
+                labels: ['Reliability', 'Speed (Inv)', 'Context Size', 'Logical Purity'],
+                datasets: [{
+                    label: 'Venice Reasoning',
+                    data: [reasoningData.reliability, (7 - reasoningData.speed) * 100 / 6, (reasoningData.context / 200000) * 100, 98],
+                    backgroundColor: 'rgba(85, 221, 224, 0.4)',
+                    borderColor: colors.blue,
+                    pointBackgroundColor: colors.blue,
+                    pointBorderColor: '#fff',
+                }]
+            },
+            options: radarOptions
+        });
+
+        // Chart 5: Context Window
+        const contextModels = data.filter(d => d.context > 0).sort((a, b) => b.context - a.context);
+        new Chart(document.getElementById('contextWindowChart'), {
+            type: 'bar',
+            data: {
+                labels: contextModels.map(d => wrapLabel(d.model)),
+                datasets: [{
+                    label: 'Max Context (Tokens)',
+                    data: contextModels.map(d => d.context),
+                    backgroundColor: colors.yellow,
+                    borderColor: colors.darkestBlue,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                ...tooltipPlugin,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        type: 'logarithmic',
+                        title: { display: true, text: 'Tokens (Logarithmic Scale)', color: '#F7F7F7' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: {
+                            color: '#F7F7F7',
+                            callback: function(value, index, values) {
+                                if (value === 1000000) return '1M';
+                                if (value === 100000) return '100K';
+                                if (value === 10000) return '10K';
+                                if (value === 1000) return '1K';
+                                return null;
+                            }
+                        }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#F7F7F7' }
+                    }
+                }
+            }
+        });
+
+    </script>
 </body>
 </html>
+```eof
